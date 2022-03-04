@@ -45,6 +45,24 @@ public class MainActivity extends AppCompatActivity {
                 responseText.setText(n.response);
             }
         });
+
+        sortBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String input = inputField.getText().toString();
+
+                SortingThread c = new SortingThread(input);
+                c.start();
+                try {
+                    c.join();
+                } catch (InterruptedException e) {
+                    Log.d("custom", e.getMessage());
+
+                }
+
+                responseText.setText(c.response);
+            }
+        });
     }
 
     private static class NetworkThread extends Thread {
@@ -74,5 +92,30 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    public static class SortingThread extends Thread{
+        String studentNumber;
+        String response;
+
+        SortingThread(String studentNumber){
+            this.studentNumber = studentNumber;
+            this.response = "None";
+        }
+
+        public void run(){
+            StringBuilder result = new StringBuilder();
+            outer:
+            for (char c : studentNumber.toCharArray()) {
+                int n = Character.getNumericValue(c);
+
+                if (n <= 1) continue;
+                for (int i = 2; i < n; i++) {
+                    if (n % i == 0) continue outer;
+                }
+                result.append(c);
+            }
+            response = result.toString();
+        }
     }
 }
