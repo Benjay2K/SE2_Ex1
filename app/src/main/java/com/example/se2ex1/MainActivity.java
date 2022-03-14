@@ -22,15 +22,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //find components by id
         EditText inputField = findViewById(R.id.input);
         TextView responseText = findViewById(R.id.result);
 
         Button sendBtn = findViewById(R.id.sendButton);
         Button sortBtn = findViewById(R.id.sortButton);
 
+        //action listener for send button
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //save getText toString in String input, create new NetworkThread class and start
                 String input = inputField.getText().toString();
                 NetworkThread n = new NetworkThread(input);
                 n.start();
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //action listener for sort button
         sortBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -53,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
                 SortingThread c = new SortingThread(input);
                 c.start();
+
                 try {
                     c.join();
                 } catch (InterruptedException e) {
@@ -65,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //NetworkThread for send button
     private static class NetworkThread extends Thread {
         String studentNumber;
         String response;
@@ -74,9 +80,11 @@ public class MainActivity extends AppCompatActivity {
             this.response = "None";
         }
 
+        //initialized by n.start(); changes not possible in main thread (android)
         public void run() {
 
             try {
+                //create tcp socket
                 Socket socket = new Socket("se2-isys.aau.at", 53212);
 
                 DataOutputStream sendChannel = new DataOutputStream(socket.getOutputStream());
@@ -87,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
                 socket.close();
 
+                //try/catch necessary for sockets
             } catch (IOException e) {
                 this.response = "Failed";
             }
@@ -103,8 +112,10 @@ public class MainActivity extends AppCompatActivity {
             this.response = "None";
         }
 
+        //sorting method
         public void run(){
             StringBuilder result = new StringBuilder();
+            //sort prim digits
             outer:
             for (char c : studentNumber.toCharArray()) {
                 int n = Character.getNumericValue(c);
